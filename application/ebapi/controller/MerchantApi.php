@@ -64,7 +64,7 @@ class MerchantApi extends AuthController
 
         $merInfo = StoreMerchant::getMerchantInfo($id,$this->userInfo['uid']);
 
-        $similarity = StoreProduct::where(['mer_id'=>$merInfo['id'],'is_best'=>'1','is_del'=>'0'])->field('id,store_name,cate_id,image,ficti as sales,price,stock,store_info,ot_price')->order(' sort DESC, id DESC')->limit(4)->select();
+        $similarity = StoreProduct::where(['mer_id'=>$merInfo['id'],'is_best'=>'1','is_del'=>'0'])->field('id,store_name,cate_id,image,ficti as sales,price,stock,store_info,ot_price,type')->order(' sort DESC, id DESC')->limit(4)->select();
 
         return JsonService::successful(compact('merInfo','similarity'));
     }

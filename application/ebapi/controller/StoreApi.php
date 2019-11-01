@@ -171,16 +171,10 @@ class StoreApi extends AuthController
 
         $storeInfo['userCollect'] = StoreProductRelation::isProductRelation($id,$this->userInfo['uid'],'collect');
 
-        $storeInfo['attention'] = explode('。',$storeInfo['attention']);
+//        $storeInfo['attention'] = explode('。',$storeInfo['attention']);
         //通过trip_id查询得到项目行程的信息
         $trip_result=Db::table('eb_store_trip')->where('id','=',$storeInfo['trip_id'])->find();
         //对行程信息的process数据进行梳理
-        $array=explode('|',$trip_result['process']);
-        $trip_result['process']=[];
-        foreach($array as $key=>$item ){
-            $list=explode(',',$item);
-            array_push($trip_result['process'],$list);
-        }
         $storeInfo['trip_id']=$trip_result;
 //      $storeInfo['open_date'] = json_decode($storeInfo['open_date']);
         list($productAttr,$productValue) = StoreProductAttr::getProductAttrDetail($id);

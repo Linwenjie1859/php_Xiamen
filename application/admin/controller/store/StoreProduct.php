@@ -208,11 +208,11 @@ class StoreProduct extends AuthController
             Form::frameImageOne('image', '产品主图片(305*305px)', Url::build('admin/widget.images/index', array('fodder' => 'image')))->icon('image')->width('100%')->height('500px'),
             Form::frameImages('slider_image', '产品轮播图(640*640px)', Url::build('admin/widget.images/index', array('fodder' => 'slider_image')))->maxLength(5)->icon('images')->width('100%')->height('500px')->spin(0),
 
-            Form::input('process','行程安排')->col(24)->placeholder('输入行程和时间格式：事件,时间点（多个事件以|隔开）：例如：早晨海边散步,7:00|坐大巴车前往西湖,8:00'),
+//            Form::input('process','行程安排')->col(24)->placeholder('输入行程和时间格式：事件,时间点（多个事件以|隔开）：例如：早晨海边散步,7:00|坐大巴车前往西湖,8:00'),
 
             // Form::dateRange('open_date', '项目开业日期')->type('daterange')->confirm(true)->showWeekNumbers(true),
             Form::city('open_address', '游玩项目地点')->type('city_area')->trigger('click')->filterable(true),
-            Form::input('attention', '费用须知')->placeholder('多个注意点用“ 。”做结尾,例如：1、车费自理。2、早餐自带。'),
+//            Form::input('attention', '费用须知')->placeholder('多个注意点用“ 。”做结尾,例如：1、车费自理。2、早餐自带。'),
 
             Form::number('view', '景点数')->min(0)->col(8),
             Form::number('eat', '餐饮次数')->min(0)->col(8),
@@ -268,8 +268,8 @@ class StoreProduct extends AuthController
             'store_name',
             'store_info',
             'keyword',
-            'attention',
-            'process',
+//            'attention',
+//            'process',
             ['view',0],
             ['eat',0],
             ['item',0],
@@ -304,9 +304,9 @@ class StoreProduct extends AuthController
         if (count($data['image']) < 1) return Json::fail('请上传产品图片');
         if (count($data['slider_image']) < 1) return Json::fail('请上传产品轮播图');
 
-        if (!$data['process']) return Json::fail('请输入项目行程安排');
+//        if (!$data['process']) return Json::fail('请输入项目行程安排');
         if (count($data['open_address']) < 1) return Json::fail('请填写项目地点');
-        if (!$data['attention']) return Json::fail('请输入费用须知注意点');
+//        if (!$data['attention']) return Json::fail('请输入费用须知注意点');
 
         if ($data['price'] == '' || $data['price'] < 0) return Json::fail('请输入产品售价');
         if ($data['ot_price'] == '' || $data['ot_price'] < 0) return Json::fail('请输入产品市场价');
@@ -320,7 +320,7 @@ class StoreProduct extends AuthController
         $trip_data['view']=$data['view'];
         $trip_data['eat']=$data['eat'];
         $trip_data['item']=$data['item'];
-        $trip_data['process']=$data['process'];
+//        $trip_data['process']=$data['process'];
 
         $trip_id=TripModel::set($trip_data);
         $data['trip_id']=$trip_id['id'];
@@ -385,17 +385,24 @@ class StoreProduct extends AuthController
     }
 
 
-    public function edit_content($id)
+    public function edit_content($id,$type=1,$field='description')
     {
         if (!$id) return $this->failed('数据不存在');
         $product = ProductModel::get($id);
         if (!$product) return Json::fail('数据不存在!');
-        $this->assign([
-            'content' => ProductModel::where('id', $id)->value('description'),
-            'field' => 'description',
-            'action' => Url::build('change_field', ['id' => $id, 'field' => 'description'])
-        ]);
-        return $this->fetch('public/edit_content');
+        if($type==1){
+            $this->assign([
+                'content' => ProductModel::where('id', $id)->value($field),
+                'field' => $field,
+                'action' => Url::build('change_field', ['id' => $id, 'field' => $field])
+            ]);
+            return $this->fetch('public/edit_content');
+        }else{
+            $this->assign([
+                'content' => $id,
+            ]);
+            return $this->fetch('public/edit_item_content');
+        }
     }
 
     /**
@@ -428,9 +435,9 @@ class StoreProduct extends AuthController
                 Form::frameImageOne('image', '产品主图片(305*305px)', Url::build('admin/widget.images/index', array('fodder' => 'image')), $product->getData('image'))->icon('image')->width('100%')->height('500px'),
                 Form::frameImages('slider_image', '产品轮播图(640*640px)', Url::build('admin/widget.images/index', array('fodder' => 'slider_image')), json_decode($product->getData('slider_image'), 1) ?: [])->maxLength(5)->icon('images')->width('100%')->height('500px'),
 
-                Form::input('process','行程安排',$trip->getData('process'))->col(24)->placeholder('输入行程和时间格式：事件,时间点（多个事件以|隔开）：例如：早晨海边散步,7:00|坐大巴车前往西湖,8:00'),
+//                Form::input('process','行程安排',$trip->getData('process'))->col(24)->placeholder('输入行程和时间格式：事件,时间点（多个事件以|隔开）：例如：早晨海边散步,7:00|坐大巴车前往西湖,8:00'),
                 Form::city('open_address', '游玩项目地点')->type('city_area')->trigger('click')->filterable(true)->placeholder($product->getData('open_address')),
-                Form::input('attention', '费用须知',$product->getData('attention'))->placeholder('多个注意点用“ 。”做结尾,例如：1、车费自理。2、早餐自带。'),
+//                Form::input('attention', '费用须知',$product->getData('attention'))->placeholder('多个注意点用“ 。”做结尾,例如：1、车费自理。2、早餐自带。'),
 
 
                 Form::number('view', '景点数',$trip->getData('view'))->min(0)->col(8),
@@ -520,8 +527,8 @@ class StoreProduct extends AuthController
             'store_name',
             'store_info',
             'keyword',
-            'attention',
-            'process',
+//            'attention',
+//            'process',
             ['open_address', []],
             ['unit_name', '件'],
             ['image', []],
@@ -548,11 +555,11 @@ class StoreProduct extends AuthController
         ], $request);
 
         if (!$data['store_name']) return Json::fail('请输入产品名称');
-        if (!$data['attention']) return Json::fail('请输入费用须知注意点');
+//        if (!$data['attention']) return Json::fail('请输入费用须知注意点');
         if (count($data['image']) < 1) return Json::fail('请上传产品图片');
         if (count($data['slider_image']) < 1) return Json::fail('请上传产品轮播图');
 
-        if (!$data['process']) return Json::fail('请输入项目行程路线');
+//        if (!$data['process']) return Json::fail('请输入项目行程路线');
         if (count($data['open_address']) < 1){
             $data['open_address']=Db::table('eb_store_product')->where('id',"=",$id)->find()['open_address'];
         }else{
@@ -569,7 +576,7 @@ class StoreProduct extends AuthController
         $trip_data['view']=$data['view'];
         $trip_data['eat']=$data['eat'];
         $trip_data['item']=$data['item'];
-        $trip_data['process']=$data['process'];
+//        $trip_data['process']=$data['process'];
         TripModel::edit($trip_data,Db::table('eb_store_product')->where('id','=',$id)->find()['trip_id']);
         ProductModel::edit($data, $id);
     

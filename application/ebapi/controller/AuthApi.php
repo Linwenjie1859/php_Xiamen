@@ -16,6 +16,7 @@ use app\ebapi\model\user\User;
 use app\ebapi\model\store\StorePink;
 use app\ebapi\model\store\StoreBargainUser;
 use app\ebapi\model\store\StoreBargainUserHelp;
+use think\Db;
 
 /**
  * 小程序 购物车,新增订单等 api接口
@@ -195,8 +196,8 @@ class AuthApi extends AuthController
         if (!$key) return JsonService::fail('参数错误!');
         if (StoreOrder::be(['order_id|unique' => $key, 'uid' => $this->userInfo['uid'], 'is_del' => 0]))
             return JsonService::status('extend_order', '订单已生成', ['orderId' => $key, 'key' => $key]);
-        list($addressId, $couponId, $payType, $useIntegral, $mark, $combinationId, $pinkId, $seckill_id, $formId, $bargainId,$type,$date,$open_address) = UtilService::postMore([
-            'addressId', 'couponId', 'payType', 'useIntegral', 'mark',['combinationId', 0], ['pinkId', 0], ['seckill_id', 0], ['formId', ''], ['bargainId', ''],'type','date','open_address',
+        list($addressId, $couponId, $payType, $useIntegral, $mark, $combinationId, $pinkId, $seckill_id, $formId, $bargainId,$type,$date,$open_address,$mer_id) = UtilService::postMore([
+            'addressId', 'couponId', 'payType', 'useIntegral', 'mark',['combinationId', 0], ['pinkId', 0], ['seckill_id', 0], ['formId', ''], ['bargainId', ''],'type','date','open_address','mer_id'
         ], Request::instance(), true);
         $payType = $payType ? strtolower($payType) : 'weixinapp';
    
@@ -207,6 +208,8 @@ class AuthApi extends AuthController
         $orderId = $order['order_id'];
         $info = compact('orderId', 'key');
         if ($orderId) {
+            $num = Db::table('eb_store_merchant')->where('id', $mer_id)->value('sale_count');
+            Db::table('eb_store_merchant')->update(['id'=>$mer_id, 'sale_count'=>$num+1]);
             switch ($payType) {
                 case "weixin":
                     $orderInfo = StoreOrder::where('order_id', $orderId)->find();
@@ -263,6 +266,7 @@ class AuthApi extends AuthController
                     return JsonService::status('alipay_app', '订单创建成功', $info);
                     break;
             }
+
         } else return JsonService::fail(StoreOrder::getErrorInfo('订单生成失败!'));
     }
 

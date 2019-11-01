@@ -118,7 +118,7 @@
                         <button type="button" class="layui-btn layui-btn-xs" onclick="dropdown(this)">操作 <span class="caret"></span></button>
                         <ul class="layui-nav-child layui-anim layui-anim-upbit">
                             <li>
-                                <a href="javascript:void(0);" class="" onclick="$eb.createModalFrame(this.innerText,'{:Url('edit_content')}?id={{d.id}}')">
+                                <a href="javascript:void(0);" class="" onclick="$eb.createModalFrame(this.innerText,'{:Url('edit_content')}?id={{d.id}}&&type={{d.type}}')">
                                     <i class="fa fa-pencil"></i> 产品详情</a>
                             </li>
                             <li>

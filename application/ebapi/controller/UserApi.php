@@ -261,9 +261,9 @@ class UserApi extends AuthController
         if(!$uni) return JsonService::fail('参数错误!');
 
         $res = StoreOrder::takeOrder($uni,$this->userInfo['uid']);
-        if($res)
+        if($res){
             return JsonService::successful();
-        else
+        }else
             return JsonService::fail(StoreOrder::getErrorInfo());
     }
 

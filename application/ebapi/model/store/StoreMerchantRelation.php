@@ -11,6 +11,7 @@ use app\core\behavior\GoodsBehavior;
 use service\HookService;
 use traits\ModelTrait;
 use basic\ModelBasic;
+use think\Db;
 
 /**
  * 点赞收藏model
@@ -40,14 +41,13 @@ class StoreMerchantRelation extends ModelBasic
         $count = self::where('uid',$uid)->where('type','collect')->count();
         return $count;
     }
-
+    
     /**
-     * 添加点赞 收藏
-     * @param $merId
-     * @param $uid
-     * @param $relationType
-     * @param string $category
-     * @return bool
+     * @Modify: Mr. Lin
+     * @function: 添加点赞 收藏
+     * @instructions: 
+     * @param {type} 
+     * @return: JSON
      */
     public static function merchantRelation($merId,$uid,$relationType,$category = 'product')
     {
@@ -60,17 +60,18 @@ class StoreMerchantRelation extends ModelBasic
         if(self::be($data)) return true;
         $data['add_time'] = time();
         self::set($data);
+        $num = Db::table('eb_store_merchant')->where('id', $merId)->value('fav_count');
+        Db::table('eb_store_merchant')->update(['id'=>$merId, 'fav_count'=>$num+1]);
         HookService::afterListen('store_'.$category.'_'.$relationType,$merId,$uid,false,GoodsBehavior::class);
         return true;
     }
 
     /**
-     * 取消 点赞 收藏
-     * @param $merId
-     * @param $uid
-     * @param $relationType
-     * @param string $category
-     * @return bool
+     * @Modify: Mr. Lin
+     * @function: 取消 点赞 收藏
+     * @instructions: 
+     * @param {type} 
+     * @return: JSON
      */
     public static function unMerchantRelation($merId,$uid,$relationType,$category = 'product')
     {
@@ -78,6 +79,10 @@ class StoreMerchantRelation extends ModelBasic
         $relationType = strtolower($relationType);
         $category = strtolower($category);
         self::where(['uid'=>$uid,'mer_id'=>$merId,'type'=>$relationType,'category'=>$category])->delete();
+        $num = Db::table('eb_store_merchant')->where('id', $merId)->value('fav_count');
+        if($num>0){
+            Db::table('eb_store_merchant')->update(['id'=>$merId, 'fav_count'=>$num-1]);
+        }
         HookService::afterListen('store_'.$category.'_un_'.$relationType,$merId,$uid,false,GoodsBehavior::class);
         return true;
     }

@@ -14,6 +14,7 @@
     <script type="text/javascript" charset="utf-8" src="{__ADMIN_PATH}plug/umeditor/umeditor.config.js"></script>
     <script type="text/javascript" charset="utf-8" src="{__ADMIN_PATH}plug/umeditor/umeditor.min.js"></script>
     <script type="text/javascript" src="{__ADMIN_PATH}plug/umeditor/lang/zh-cn/zh-cn.js"></script>
+    
     <style>
         .edui-btn-toolbar .edui-btn.edui-active .edui-icon-fullscreen.edui-icon{  display: none;}
         .edui-container{overflow: initial !important;}
@@ -31,15 +32,22 @@
         .btn-success.active, .btn-success:active, .btn-success:focus, .btn-success:hover, .open .dropdown-toggle.btn-success { background-color: #1a7bb9; border-color: #1a7bb9; color: #FFF;  }
         .dim{bottom: 7px; right: 8px; z-index: 1003; position: fixed !important;}
     </style>
+    
 </head>
 <body>
+
+
 <button class="btn btn-success  dim" data-url="{$action}" type="button"><i class="fa fa-upload"></i>
 </button>
-<script type="text/plain" id="myEditor" style="width:100%;">
+
+<script type="text/plain" id="myEditor" style="width:100%;" >
 {$content ? $content : ''}
 </script>
+
+
 <script type="text/javascript">
     $eb = parent._mpApi;
+    //点击之后就开始了上传保存
     $('.dim').on('click',function(){
         $eb.axios.post($(this).data('url'),{'{$field}':getContent()}).then(function(res){
             if(res.status == 200 && res.data.code == 200){
@@ -50,6 +58,7 @@
             $eb.message('error',err);
         })
     });
+
     var editor = document.getElementById('myEditor');
     editor.style.height = document.body.scrollHeight+'px';
     //实例化编辑器
