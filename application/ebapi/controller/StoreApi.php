@@ -42,7 +42,8 @@ class StoreApi extends AuthController
             'details',
             'get_merchant_index',
             'get_best_product',
-            'get_other_product'
+            'get_other_product',
+            'get_id_cate'
         ];
     }
 
@@ -117,8 +118,8 @@ class StoreApi extends AuthController
      * @param Request $request
      * @return \think\response\Json
      */
-    public function get_id_cate(Request $request){
-        $data = UtilService::postMore([['id',0]],$request);
+    public function get_id_cate(){
+        $data['id'] = 0;
         $dataCateA = [];
         $dataCateA[0]['id'] = $data['id'];
         $dataCateA[0]['cate_name'] = '全部商品';
@@ -159,8 +160,10 @@ class StoreApi extends AuthController
     }
 
     /**
-     * 商品详情页
-     * @param Request $request
+     * @return:
+     * @author Handsome Lin
+     * @date 2019/11/20 12:32
+     * @Notes:商品详情页
      */
     public function details($id=0){
         if(!$id || !($storeInfo = StoreProduct::getValidProduct($id))) return JsonService::fail('商品不存在或已下架');
@@ -171,12 +174,9 @@ class StoreApi extends AuthController
 
         $storeInfo['userCollect'] = StoreProductRelation::isProductRelation($id,$this->userInfo['uid'],'collect');
 
-//        $storeInfo['attention'] = explode('。',$storeInfo['attention']);
-        //通过trip_id查询得到项目行程的信息
         $trip_result=Db::table('eb_store_trip')->where('id','=',$storeInfo['trip_id'])->find();
         //对行程信息的process数据进行梳理
         $storeInfo['trip_id']=$trip_result;
-//      $storeInfo['open_date'] = json_decode($storeInfo['open_date']);
         list($productAttr,$productValue) = StoreProductAttr::getProductAttrDetail($id);
         setView($this->userInfo['uid'],$id,$storeInfo['cate_id'],'viwe');
 
@@ -192,7 +192,8 @@ class StoreApi extends AuthController
             $data['replyChance']=bcdiv($goodReply,$data['replyCount'],2);
             $data['replyChance']=bcmul($data['replyChance'],100,3);
         }else $data['replyChance']=0;
-        $data['mer_id'] = StoreProduct::where('id',$storeInfo['id'])->value('mer_id');
+        $mer_id = StoreProduct::where('id',$storeInfo['id'])->value('mer_id');
+        $data['merInfo'] = StoreMerchant::getMerchantInfo($mer_id,$this->userInfo['uid']);
         return JsonService::successful($data);
     }
 

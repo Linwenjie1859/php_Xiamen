@@ -64,7 +64,7 @@ class StoreMerchant extends ModelBasic {
         $merchant = self::alias("a")->field('a.id,a.store_name,a.store_logo,a.views,a.fav_count,a.sale_count,a.lng,a.lat,b.uid as is_collect')->where('a.status', 1)
             ->join("store_merchant_relation b","a.id = b.mer_id and b.uid = $uid",'left')
             ->where(['id'=>$id])->find();
-
+            
         return $merchant;
     }
 }

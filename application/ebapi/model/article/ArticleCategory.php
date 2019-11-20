@@ -37,20 +37,18 @@ class ArticleCategory extends ModelBasic
     }
 
     /**
-     * TODO 获取文章分类
+     * TODO 获取文章分类内容
      * @return false|\PDOStatement|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
     public static function getArticleIndex($first = 0, $limit = 3){
-        $category =  self::where('hidden',0)->where('is_del',0)->where('status',1)
-            ->where('pid',0)->order('sort DESC')->field('id,title,image')->select();
+        $category = self::getArticleCategory(); 
 
         foreach ($category as $k=>$v){
-            $article = Article::field('id,title,author,image_input,synopsis,visit,add_time')->where('status', 1)
+            $article = Article::field('*')->where('status', 1)
                     ->where('hide', 0)->where(['cid'=>$v['id']])->order('sort DESC,add_time DESC')->limit($first, $limit)->select();
-
             foreach ($article as $key=>$value){
                 $article[$key]['add_time'] = date("Y-m-d",$value['add_time']);
             }

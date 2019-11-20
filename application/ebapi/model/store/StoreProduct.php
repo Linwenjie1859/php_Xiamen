@@ -65,15 +65,14 @@ class StoreProduct extends ModelBasic
             else
                 $model=$model->where('cate_id',-1);
         }elseif($cId){
-            $model=$model->where('cate_id',$cId);
-//            $sids = StoreCategory::pidBySidList($cId)?:[];
-//            if($sids){
-//                $sidsr = [];
-//                foreach($sids as $v){
-//                    $sidsr[] = $v['id'];
-//                }
-//                $model=$model->where('cate_id','IN',$sidsr);
-//            }
+            $sids = StoreCategory::pidBySidList($cId)?:[];
+            if($sids){
+                $sidsr = [];
+                foreach($sids as $v){
+                    $sidsr[] = $v['id'];
+                }
+                $model=$model->where('cate_id','IN',$sidsr)->where('type','=',1);
+            }
         }elseif($mId){
             $model=$model->where('mer_id',$mId);
         }

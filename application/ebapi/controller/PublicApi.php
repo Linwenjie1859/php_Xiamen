@@ -82,32 +82,47 @@ class PublicApi extends AuthController
         return JsonService::successful($info);
     }
 
+
     /**
-     * 首页
+     * @return:
+     * @author Handsome Lin
+     * @date 2019/11/19 16:48
+     * @Notes:首页接口
      */
     public function index(){
         $banner = GroupDataService::getData('routine_home_banner')?:[];//TODO 首页banner图
         $menus = GroupDataService::getData('routine_home_menus')?:[];//TODO 首页按钮
         $roll = GroupDataService::getData('routine_home_roll_news')?:[];//TODO 首页滚动新闻
-//        $activity = GroupDataService::getData('routine_home_activity',3)?:[];//TODO 首页活动区域图片
+        $activity = GroupDataService::getData('routine_home_activity',3)?:[];//TODO 首页活动区域图片
+        
+        //内容小标题
+        $info['fastInfo'] = SystemConfigService::get('fast_info');//TODO 快速选择简介
+        $info['bastInfo'] = SystemConfigService::get('bast_info');//TODO 精品推荐简介
+        $info['firstInfo'] = SystemConfigService::get('first_info');//TODO 首发新品简介
+        $info['salesInfo'] = SystemConfigService::get('sales_info');//TODO 促销单品简介
+
 
         $logoUrl = SystemConfigService::get('routine_index_logo');//TODO 促销单品简介
         if(strstr($logoUrl,'http')===false) $logoUrl = SystemConfigService::get('site_url').$logoUrl;
         $logoUrl = str_replace('\\','/',$logoUrl);
 
-        $bastNumber = (int)SystemConfigService::get('bast_number');//TODO 精品推荐个数
-        $firstNumber = (int)SystemConfigService::get('first_number');//TODO 首发新品个数
 
-        // $info['bastList'] = StoreProduct::getBestProduct('id,image,store_name,cate_id,price,ot_price,ficti as sales,unit_name,sort',$bastNumber,$this->uid);//TODO 精品推荐个数
-        // $info['otherList'] = StoreProduct::getOtherProduct('id,image,store_name,cate_id,price,unit_name,sort',$firstNumber);//TODO 首发新品个数
-        $info['bastList'] = StoreProduct::getBestProduct('',$bastNumber,0,$this->uid);//TODO 精品推荐个数
-        $info['otherList'] = StoreProduct::getOtherProduct('',$firstNumber,0,$this->uid);//TODO 首发新品个数
+        $fastNumber = (int)SystemConfigService::get('fast_number');//TODO 快速选择分类个数.6
+        $bastNumber = (int)SystemConfigService::get('bast_number');//TODO 精品推荐个数，6
+        $firstNumber = (int)SystemConfigService::get('first_number');//TODO 首发新品个数，3
 
-        $article_category = ArticleCategory::getArticleCategory();
+        $info['fastList'] = StoreCategory::byIndexList($fastNumber);//获取Category分类的id和父id等信息
+        $info['bestList'] = StoreProduct::getBestProduct('',$bastNumber,0,$this->uid);//TODO 好物
+        $info['otherList'] = StoreProduct::getOtherProduct('',$firstNumber,0,$this->uid);//TODO
+
+        $article_category=ArticleCategory::getArticleIndex(0,1);    //返回各个文章分类中一篇文章
+
+
         $article_menus = GroupDataService::getData('article_home_menus')?:[];//TODO 首页内容按钮
 
+        $likeInfo = StoreProduct::getHotProduct('id,image,store_name,cate_id,price,unit_name,sort',3);//TODO 热门榜单 猜你喜欢
         $couponList=StoreCouponIssue::getIssueCouponList($this->uid,3);
-        return $this->successful(compact('banner','menus','roll','info','article_menus','article_category','logoUrl','couponList'));
+        return $this->successful(compact('banner','menus','roll','info','activity','article_menus','article_category','likeInfo','logoUrl','couponList'));
     }
 
     /**
