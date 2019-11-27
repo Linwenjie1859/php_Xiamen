@@ -21,7 +21,7 @@ class StoreMerchantType extends AuthController
 {
 
     /**
-     * 分类管理
+     * 分类管理delete
      * */
     public function index(){
         $where = Util::getMore([
@@ -134,7 +134,7 @@ class StoreMerchantType extends AuthController
      * */
     public function delete($id)
     {
-        $res = StoreMerchantTypeModel::delArticleCategory($id);
+        $res = StoreMerchantTypeModel::delMerchant($id);
         if(!$res)
             return Json::fail(StoreMerchantTypeModel::getErrorInfo('删除失败,请稍候再试!'));
         else

@@ -152,9 +152,11 @@ class StoreApi extends AuthController
             ['priceOrder',''],
             ['salesOrder',''],
             ['news',0],
+            ['hot',0],
             ['benefit',0],
             ['page',0],
-            ['limit',0]
+            ['limit',0],
+            ['type',1],
         ],$this->request);
         return JsonService::successful(StoreProduct::getProductList($data,$this->uid));
     }

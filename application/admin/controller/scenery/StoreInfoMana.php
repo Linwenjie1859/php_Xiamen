@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller\store;
+namespace app\admin\controller\scenery;
 
 use app\admin\controller\AuthController;
 use app\admin\library\FormBuilder;

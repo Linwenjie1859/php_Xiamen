@@ -43,12 +43,23 @@
                 <div class="layui-card-header">商品编辑</div>
                 <div class="layui-card-body">
                     <form class="layui-form" action="">
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">所属店铺</label>
+                            <div class="layui-input-block">
+                                <select name="mer_id" v-model="productInfo.mer_id" lay-verify="mer_id" lay-filter="mer_id">
+                                    <option value="">请选择</option>
+                                    <option :value="item.value" v-for="item in merchantList"  v-text="item.label"></option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="layui-form-item">
                             <label class="layui-form-label">选择分类</label>
                             <div class="layui-input-block">
                                 <select name="cate_id" v-model="productInfo.cate_id" lay-verify="cate_id" lay-filter="cate_id">
                                     <option value="">请选择</option>
-                                    <option :value="item.value" v-for="item in categoryList" :disabled="item.disabled" v-text="item.label"></option>
+                                    <option :value="item.value" v-for="item in categoryList"  v-text="item.label"></option>
                                 </select>
                             </div>
                         </div>
@@ -186,6 +197,7 @@
         new Vue({
             el: "#app",
             data: {
+                merchantList:<?=json_encode($menusMerchant)?>,
                 categoryList:<?=json_encode($menus)?>,
                 link:'',
                 linkhistory:'',
@@ -235,6 +247,7 @@
                 },
                 saveProduct:function () {
                     var that=this,productInfo={
+                        mer_id:that.productInfo.mer_id,
                         cate_id:that.productInfo.cate_id,
                         store_name:that.productInfo.store_name,
                         store_info:that.productInfo.store_info,
@@ -254,6 +267,7 @@
                         description_images:that.productInfo.description_images,
                         soure_link:that.link,
                     };
+                    if(!that.productInfo.mer_id) return layList.msg('还未选择店铺,请选择');
                     if(!that.productInfo.cate_id) return layList.msg('请选择分类');
                     if(!that.productInfo.store_name) return layList.msg('请填写商品名称');
                     if(!that.productInfo.unit_name) return layList.msg('请填写产品单位');
@@ -303,6 +317,9 @@
                     layList.form.render();
                     layList.select('cate_id',function (data) {
                         that.productInfo.cate_id=data.value;
+                    });
+                    layList.select('mer_id',function (data) {
+                        that.productInfo.mer_id=data.value;
                     });
                 })
 

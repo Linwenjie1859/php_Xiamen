@@ -782,7 +782,6 @@ class StoreOrder extends ModelBasic
         foreach ($list as $k=>$order){
             $list[$k] = self::tidyOrder($order,true);
         }
-
         return $list;
     }
 

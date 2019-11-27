@@ -34,17 +34,7 @@ class StoreMerchantType extends ModelBasic
         return self::page($model);
     }
 
-    /**
-     * 删除分类
-     * @param $id
-     * @return bool
-     */
-    public static function delArticleCategory($id)
-    {
-        if(count(self::getMerchant($id,'*'))>0)
-            return self::setErrorInfo('请先删除改分类下的店铺!');
-        return self::edit(['is_del'=>1],$id,'id');
-    }
+
 
     /**
      * 获取分类名称和id     field
@@ -66,19 +56,25 @@ class StoreMerchantType extends ModelBasic
     }
 
     /**
-     * 获取分类底下的文章
-     * id  分类表中的分类id
-     * return array
-     * */
+     * @return:
+     * @author Handsome Lin
+     * @date 2019/11/21 10:12
+     * @Notes:根据分类id删除店铺
+     */
+    public static function delMerchant($id)
+    {
+        if(count(self::getMerchant($id,'*'))>0)     //查看该分类是否有店铺存在,统计返回的数组的个数
+            return self::setErrorInfo('请先删除改分类下的店铺!');
+        return self::edit(['is_del'=>1],$id,'id');
+    }
+
+    /**
+     * @return:数组
+     * @author Handsome Lin
+     * @date 2019/11/21 10:37
+     * @Notes:通过分类的id,查看该分类下还有存在的店铺
+     */
     public static function getMerchant($id,$field){
-        $res = StoreMerchantModel::where('status',1)->column($field,'id');
-        $new_res = array();
-        foreach ($res as $k=>$v){
-            $cid_arr = explode(',',$v['cid']);
-            if(in_array($id,$cid_arr)){
-                $new_res[$k] = $res[$k];
-            }
-        }
-        return $new_res;
+        return $res = StoreMerchantModel::where('status',1)->where('type',"=",$id)->column($field,'id');
     }
 }

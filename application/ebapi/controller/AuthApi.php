@@ -116,12 +116,12 @@ class AuthApi extends AuthController
             return JsonService::successful('ok');
         }
     }
+
     /**
-     * 加入到购物车
-     * @param string $productId
-     * @param int $cartNum
-     * @param string $uniqueId
-     * @return \think\response\Json
+     * @return:
+     * @author Handsome Lin
+     * @date 2019/11/27 12:11
+     * @Notes:加入到购物车：生成购物车id
      */
     public function set_cart($productId = '', $merId = '', $cartNum = 1, $uniqueId = '')
     {
@@ -131,14 +131,11 @@ class AuthApi extends AuthController
         else return JsonService::successful('ok', ['cartId' => $res->id]);
     }
 
-    /**
-     * 拼团 秒杀 砍价 加入到购物车
-     * @param string $productId
-     * @param int $cartNum
-     * @param string $uniqueId
-     * @param int $combinationId
-     * @param int $secKillId
-     * @return \think\response\Json
+    /***
+     * @return:
+     * @author Handsome Lin
+     * @date 2019/11/27 12:10
+     * @Notes:立即购买：也是需要生成购物车id,立即购买后生购物车id会一直存在。
      */
     public function now_buy($productId = '', $merId = '', $cartNum = 1, $uniqueId = '', $combinationId = 0, $secKillId = 0, $bargainId = 0)
     {
@@ -199,17 +196,18 @@ class AuthApi extends AuthController
         list($addressId, $couponId, $payType, $useIntegral, $mark, $combinationId, $pinkId, $seckill_id, $formId, $bargainId,$type,$date,$open_address,$mer_id) = UtilService::postMore([
             'addressId', 'couponId', 'payType', 'useIntegral', 'mark',['combinationId', 0], ['pinkId', 0], ['seckill_id', 0], ['formId', ''], ['bargainId', ''],'type','date','open_address','mer_id'
         ], Request::instance(), true);
+
         $payType = $payType ? strtolower($payType) : 'weixinapp';
    
         if ($bargainId) StoreBargainUser::setBargainUserStatus($bargainId, $this->userInfo['uid']); //修改砍价状态
         if ($pinkId) if (StorePink::getIsPinkUid($pinkId, $this->userInfo['uid'])) return JsonService::status('ORDER_EXIST', '订单生成失败，你已经在该团内不能再参加了', ['orderId' => StoreOrder::getStoreIdPink($pinkId, $this->userInfo['uid'])]);
         if ($pinkId) if (StoreOrder::getIsOrderPink($pinkId, $this->userInfo['uid'])) return JsonService::status('ORDER_EXIST', '订单生成失败，你已经参加该团了，请先支付订单', ['orderId' => StoreOrder::getStoreIdPink($pinkId, $this->userInfo['uid'])]);
         $order = StoreOrder::cacheKeyCreateOrder($this->userInfo['uid'], $key, $addressId, $payType, $useIntegral, $couponId, $mark, $combinationId, $pinkId, $seckill_id, $bargainId,$type,$date,$open_address);
+
         $orderId = $order['order_id'];
         $info = compact('orderId', 'key');
         if ($orderId) {
-            $num = Db::table('eb_store_merchant')->where('id', $mer_id)->value('sale_count');
-            Db::table('eb_store_merchant')->update(['id'=>$mer_id, 'sale_count'=>$num+1]);
+            Db::table('eb_store_merchant')->where('id', '=',$mer_id)->setInc('sale_count',1);   //用户确认订单并且提交,该店铺的销量就加1.即使没有付款
             switch ($payType) {
                 case "weixin":
                     $orderInfo = StoreOrder::where('order_id', $orderId)->find();

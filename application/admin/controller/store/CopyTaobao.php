@@ -6,6 +6,7 @@
  */
 namespace app\admin\controller\store;
 
+use app\admin\model\store\StoreMerchant as MerchantModel;
 use service\HttpService;
 use think\exception\PDOException;
 use app\admin\controller\AuthController;
@@ -34,6 +35,7 @@ class CopyTaobao extends AuthController
     protected $errorInfo=true;
     //产品默认字段
     protected $productInfo=[
+        'mer_id'=>'',
         'cate_id'=>'',
         'store_name' =>'',
         'store_info' => '',
@@ -67,12 +69,22 @@ class CopyTaobao extends AuthController
      */
     public function index()
     {
-        $list = CategoryModel::getTierList();
-        $menus=[];
-        foreach ($list as $menu){
-            $menus[] = ['value'=>$menu['id'],'label'=>$menu['html'].$menu['cate_name'],'disabled'=>$menu['pid']== 0];//,'disabled'=>$menu['pid']== 0];
+        //获取正常店铺的店铺信息
+        $listMerchant = MerchantModel::where(['status' => '1'])->select();
+        $menusMerchant = [];
+        foreach ($listMerchant as $menu) {
+            $menusMerchant[] = ['value' => $menu['id'], 'label' => $menu['store_name']];
         }
-        $this->assign('menus',$menus);
+
+        //获取商品的分类信息
+        $listCategory = CategoryModel::getTierList();
+        $menusCategory=[];
+        foreach ($listCategory as $menu){
+            $menusCategory[] = ['value'=>$menu['id'],'label'=>$menu['html'].$menu['cate_name'],'disabled'=>$menu['pid']== 0];//,'disabled'=>$menu['pid']== 0];
+        }
+
+        $this->assign('menus',$menusCategory);
+        $this->assign('menusMerchant',$menusMerchant);
         $this->assign('is_layui',1);
         return $this->fetch();
     }
@@ -96,9 +108,12 @@ class CopyTaobao extends AuthController
         if(strtoupper($encode) != 'UTF-8') $str=mb_convert_encoding($str, 'utf-8',$encode);
         return $str;
     }
+
     /**
-     * 获取资源,并解析出对应的商品参数
-     * @return json
+     * @return:
+     * @author Handsome Lin
+     * @date 2019/11/21 12:34
+     * @Notes:获取资源,并解析出对应的商品参数
      */
     public function get_request_contents()
     {
@@ -114,6 +129,7 @@ class CopyTaobao extends AuthController
         preg_match('/<title>([^<>]*)<\/title>/', $html, $title);
         //商品标题
         $this->productInfo['store_name'] = isset($title['1']) ? str_replace(['-淘宝网','-tmall.com天猫',' - 阿里巴巴',' ','-','【图片价格品牌报价】京东','京东','【行情报价价格评测】'],'',trim($title['1'])) :'';
+        //商品的详细信息（需要进一步爬取数据）
         $this->productInfo['store_info'] = $this->productInfo['store_name'];
         try{
             //获取url信息
@@ -294,6 +310,7 @@ class CopyTaobao extends AuthController
     public function save_product()
     {
         $data=Util::postMore([
+            ['mer_id',''],
             ['cate_id',''],
             ['store_name',''],
             ['store_info',''],
@@ -314,6 +331,7 @@ class CopyTaobao extends AuthController
             ['is_show',0],
             ['soure_link',''],
         ]);
+        if(!$data['mer_id']) return JsonService::fail('请选择店铺！');
         if(!$data['cate_id']) return JsonService::fail('请选择分类！');
         if(!$data['store_name']) return JsonService::fail('请填写产品名称');
         if(!$data['unit_name']) return JsonService::fail('请填写产品单位');

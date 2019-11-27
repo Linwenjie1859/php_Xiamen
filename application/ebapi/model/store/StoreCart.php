@@ -8,6 +8,7 @@
 namespace app\ebapi\model\store;
 
 use basic\ModelBasic;
+use think\Db;
 use traits\ModelTrait;
 
 class StoreCart extends ModelBasic
@@ -151,6 +152,7 @@ class StoreCart extends ModelBasic
         if(!$status) $model->where('is_new',0);
         if($cartIds) $model->where('id','IN',$cartIds);
         $list = $model->select()->toArray();
+
         if(!count($list)) return compact('valid','invalid');
         foreach ($list as $k=>$cart){
             if($cart['seckill_id']){
@@ -166,7 +168,8 @@ class StoreCart extends ModelBasic
                 $product = StoreProduct::field($productInfoField)
                     ->find($cart['product_id']);
             }
-            $cart['productInfo'] = $product;
+            $cart['productInfo'] = $product;    //购物车中商品的详细信息
+            $cart['merchant_name'] = Db::table('eb_store_merchant')->where('id','=',$product['mer_id'])->field('store_name')->find()['store_name'];
             //商品不存在
             if(!$product){
                 $model->where('id',$cart['id'])->update(['is_del'=>1]);
@@ -294,7 +297,7 @@ class StoreCart extends ModelBasic
                 $data_id[] = $value['mer_id'];
                 $info = array();
                 $info['id'] = $value['mer_id'];
-                $info['name'] = $value['merchant_name'] ? $value['merchant_name'] : 'fyang商城';
+                $info['name'] = $value['merchant_name'] ? $value['merchant_name'] : '厦门购物场';
                 $info['list'][] = $value;
                 $data[$value['mer_id']] = $info;
             }else{

@@ -124,14 +124,27 @@ class StoreProductRelation extends ModelBasic
      * */
     public static function getUserCollectProduct($uid,$page,$limit)
     {
-        $list = self::where('A.uid',$uid)
-            ->field('B.id pid,B.store_name,B.price,B.ot_price,B.sales,B.image,B.is_del,B.is_show,B.type')->alias('A')
-            ->where('A.type','collect')->where('A.category','product')
-            ->order('A.add_time DESC')->join('__STORE_PRODUCT__ B','A.product_id = B.id')
+//        $list = self::where('A.uid',$uid)
+//            ->field('B.id pid,B.store_name,B.price,B.ot_price,B.sales,B.image,B.is_del,B.is_show,B.type')->alias('A')
+//            ->where('A.type','collect')->where('A.category','product')
+//            ->order('A.add_time DESC')->join('__STORE_PRODUCT__ B','A.product_id = B.id')
+//            ->page((int)$page,(int)$limit)->select()->toArray();
+//        foreach ($list as $k=>$product){
+//            if($product['pid']){
+//                $list[$k]['is_fail'] = $product['is_del'] && $product['is_show'];
+//            }else{
+//                unset($list[$k]);
+//            }
+//        }
+        $list = self::where('A.uid',$uid)->where('A.type','collect')
+            ->where('A.category','product')->alias('A')
+            ->field('B.id pid,B.store_name,B.price,B.ot_price,B.sales,B.image,B.is_del,B.is_show,B.type,B.ficti')
+            ->join('__STORE_PRODUCT__ B','A.product_id = B.id')->order('A.add_time DESC')
             ->page((int)$page,(int)$limit)->select()->toArray();
         foreach ($list as $k=>$product){
             if($product['pid']){
                 $list[$k]['is_fail'] = $product['is_del'] && $product['is_show'];
+                $list[$k]['sum_collect'] = count(self::where('product_id',$product['pid'])->select());
             }else{
                 unset($list[$k]);
             }

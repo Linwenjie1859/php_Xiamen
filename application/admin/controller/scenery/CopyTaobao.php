@@ -4,7 +4,7 @@
  * Author: 有一片天 <810806442@qq.com>  微信：szktor
  * Date: 2019-04-25
  */
-namespace app\admin\controller\store;
+namespace app\admin\controller\scenery;
 
 use app\admin\model\store\StoreMerchant as MerchantModel;
 use service\HttpService;

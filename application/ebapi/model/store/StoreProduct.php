@@ -53,10 +53,12 @@ class StoreProduct extends ModelBasic
         $keyword = $data['keyword'];
         $priceOrder = $data['priceOrder'];
         $salesOrder = $data['salesOrder'];
+        $hot = $data['hot'];
         $news = $data['news'];
         $benefit = $data['benefit'];
         $page = $data['page'];
         $limit = $data['limit'];
+        $type = $data['type'];
         $model = self::validWhere();
         if($sId){
             $product_ids=self::getDb('store_product_cart')->where('cate_id',$sId)->column('product_id');
@@ -65,20 +67,15 @@ class StoreProduct extends ModelBasic
             else
                 $model=$model->where('cate_id',-1);
         }elseif($cId){
-            $sids = StoreCategory::pidBySidList($cId)?:[];
-            if($sids){
-                $sidsr = [];
-                foreach($sids as $v){
-                    $sidsr[] = $v['id'];
-                }
-                $model=$model->where('cate_id','IN',$sidsr)->where('type','=',1);
-            }
+            $model=$model->where('cate_id','=',$cId)->where('type','=',1);
         }elseif($mId){
             $model=$model->where('mer_id',$mId);
         }
         if(!empty($keyword)) $model=$model->where('keyword|store_name','LIKE',htmlspecialchars("%$keyword%"));
+        if($hot!=0) $model=$model->where('is_hot',1);
         if($news!=0) $model=$model->where('is_new',1);
         if($benefit!=0) $model=$model->where('is_benefit',1);
+        $model=$model->where('type',$type); //只显示商品，不会显示游玩项目
         $baseOrder = '';
         if($priceOrder) $baseOrder = $priceOrder == 'desc' ? 'price DESC' : 'price ASC';
 //        if($salesOrder) $baseOrder = $salesOrder == 'desc' ? 'sales DESC' : 'sales ASC';//真实销量
