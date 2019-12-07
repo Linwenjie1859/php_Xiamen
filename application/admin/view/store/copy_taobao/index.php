@@ -155,17 +155,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!--                        <div class="layui-form-item" v-if="productInfo.description_images.length">-->
-                        <!--                            <label class="layui-form-label">详情图片</label>-->
-                        <!--                            <div class="layui-input-block">-->
-                        <!--                                <div class="layui-box" :class="item.isSelect ? 'box-border-color':'' " v-for="(item,index) in productInfo.description_images" >-->
-                        <!--                                    <img :src="item.pic" alt="" class="layui-input-image" @click="lookImage(item.pic)">-->
-                        <!--                                    <div class="layui-btn-group" style="margin-top: 12px">-->
-                        <!--                                        <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" @click="item.isSelect = !item.isSelect">{{ item.isSelect ? '移除': '选中' }}</button>-->
-                        <!--                                    </div>-->
-                        <!--                                </div>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
+
                         <div class="layui-form-item layui-input-margin-5" style="margin-bottom: 40px;">
                             <label class="layui-form-label">详情内容</label>
                             <div class="layui-input-block">

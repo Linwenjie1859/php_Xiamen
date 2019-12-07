@@ -141,8 +141,8 @@
         gets = Object.keys(q).map(function(key) {
             return key + '=' + q[key];
         }).join('&');
-        var domain = document.domain;
-        return 'http://' + domain + '/' + m + '/' + c + '/' + a + (params == '' ? '' : '/' + params) + (gets == '' ? '' : '?' + gets);
+        var domain = document.domain;   //Handsome Lin
+        return 'http://' + m + '/' + c + '/' + a + (params == '' ? '' : '/' + params) + (gets == '' ? '' : '?' + gets);
     };
     layList.U = function(obj) {
             return this.Url(obj);
